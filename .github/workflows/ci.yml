@@ -1,0 +1,47 @@
+name: CI Pipeline
+
+on: push
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang-format
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+      - name: Check Style
+        run: find src tests -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run --Werror
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libboost-test-dev cmake g++ libeigen3-dev libyaml-cpp-dev
+      - name: Configure and Build
+        run: |
+          cmake -S . -B build
+          cmake --build build
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libboost-test-dev libeigen3-dev libyaml-cpp-dev
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build
+      - name: Run Tests
+        run: |
+          # Ensure the test executable has permission to run
+          chmod +x build/testsidemade
+          cd build && ctest --output-on-failure
