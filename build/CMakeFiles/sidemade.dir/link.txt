@@ -1,1 +1,0 @@
-/usr/bin/c++  -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/sidemade.dir/src/Configuration.cpp.o CMakeFiles/sidemade.dir/src/MatrixSolver.cpp.o CMakeFiles/sidemade.dir/src/matrixIO.cpp.o CMakeFiles/sidemade.dir/src/main.cpp.o -o sidemade  -lyaml-cpp
